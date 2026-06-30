@@ -1,0 +1,75 @@
+# Blueprint Render — SHAE Marketplace (Docker + MySQL/MariaDB)
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: shae
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /up
+    autoDeployTrigger: commit
+    buildFilter:
+      paths:
+        - app/**
+        - bootstrap/**
+        - config/**
+        - database/**
+        - docker/**
+        - public/**
+        - resources/**
+        - routes/**
+        - storage/**
+        - Dockerfile
+        - composer.json
+        - composer.lock
+        - render.yaml
+    envVars:
+      - key: APP_NAME
+        value: SHAE
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        sync: false
+      - key: APP_FORCE_HTTPS
+        value: "true"
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: info
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: 127.0.0.1
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_DATABASE
+        value: shae
+      - key: DB_USERNAME
+        value: shae
+      - key: DB_PASSWORD
+        generateValue: true
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: public
+      - key: MAIL_MAILER
+        value: log
+      - key: LABPAY_API_URL
+        value: https://api.labyrinthe-rdc.com
+      - key: LABPAY_API_KEY
+        sync: false
+      - key: LABPAY_CURRENCY
+        value: USD
+      - key: LABPAY_COUNTRY
+        value: CD
+      - key: LABPAY_CALLBACK_URL
+        sync: false

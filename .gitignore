@@ -20,8 +20,12 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/app/labpay-api-token.txt
 /vendor
+/php-shae.local.ini
 _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/Examen/
+/storage/framework/tmp/

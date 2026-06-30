@@ -1,281 +1,240 @@
-# README — Examen Final Laravel
-### Faculté des Sciences Informatiques (FASI) — Université Protestant du Congo (UPC)
-### Promotion L3 · Année académique 2025–2026
+# SHAE — Marketplace web
+
+**Examen final Laravel — FASI/UPC — Promotion L3 — Année académique 2025–2026**
+
+**Étudiant(e) :** MULEMBWE NGUBA SHARONE
 
 ---
 
-## Objectif du projet
+## Description du projet
 
-Concevoir et développer une application web complète avec **Laravel**, en respectant les bonnes pratiques du développement moderne. Le projet doit démontrer la maîtrise des concepts fondamentaux et avancés vus en cours, tout en répondant à un besoin réel et concret.
-
----
-
-## Structure attendue du dépôt
-
-```
-nom-du-projet/
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   ├── Middleware/
-│   │   └── Requests/
-│   ├── Models/
-│   └── Mail/
-├── database/
-│   ├── migrations/
-│   └── seeders/
-├── resources/
-│   ├── views/
-│   └── lang/
-├── routes/
-│   ├── web.php
-│   └── api.php
-├── .env.example
-├── README.md
-└── ...
-```
+**SHAE** est une marketplace en ligne inspirée des plateformes e-commerce modernes. Les **gestionnaires** publient et modèrent le catalogue produits ; les **clients** parcourent le catalogue, passent commande et paient via **mobile money** (API LabPay) ; l’**administrateur** supervise la plateforme (utilisateurs, statistiques).
 
 ---
 
-## Exigences techniques
+## Technologies utilisées
 
-Les exigences sont classées en **3 niveaux** : Fondamentaux, Intermédiaires, et Avancés.
+| Composant | Version / outil |
+|-----------|-----------------|
+| Framework | Laravel 13 |
+| Langage | PHP 8.3+ |
+| Base de données | MySQL |
+| Frontend | Blade, Bootstrap 5 |
+| Graphiques | Chart.js (dashboard admin) |
+| API | Laravel Sanctum |
+| PDF | DomPDF (`barryvdh/laravel-dompdf`) |
+| Paiement mobile | LabPay — [documentation](https://doc.api.labyrinthe-rdc.com/) |
+| Emails (dev) | Mailtrap (Email Testing) |
 
----
-
-### Niveau 1 — Fondamentaux *(obligatoires)*
-
-#### 1. Architecture MVC & Structure du projet
-- Respect strict de l'architecture MVC (Models, Views, Controllers)
-- Code organisé, lisible et commenté
-- Utilisation des conventions de nommage Laravel
-
-#### 2. Base de données & Migrations
-- Toutes les tables créées via des **migrations** (aucune table créée manuellement)
-- Utilisation des **relations Eloquent** (hasMany, belongsTo, belongsToMany, etc.)
-- **Seeders** pour peupler la base de données avec des données de test réalistes
-- Respect de la normalisation des données (pas de redondance inutile)
-
-#### 3. Opérations CRUD complètes
-- Au moins **une entité principale** avec les 4 opérations (Create, Read, Update, Delete)
-- Pagination des listes (`paginate()`)
-- Recherche et filtrage des données
-
-#### 4. Routage & Contrôleurs
-- Utilisation des **Resource Controllers** (`Route::resource`)
-- Séparation claire des routes web et API
-- Routes nommées (`route('nom.action')`)
-
-#### 5. Vues Blade
-- Utilisation des **layouts Blade** (`@extends`, `@section`, `@yield`)
-- Composants réutilisables (`@include`, `@component`)
-- Affichage conditionnel selon les rôles (`@can`, `@auth`, `@role`)
-
-#### 6. Validation des formulaires
-- Validation via **Requests** dédiés
-- Messages d'erreur personnalisés et affichés à l'utilisateur
-- Protection **CSRF** sur tous les formulaires (`@csrf`)
+**Dépendances ajoutées :** `laravel/sanctum`, `barryvdh/laravel-dompdf`
 
 ---
 
-### Niveau 2 — Intermédiaires *(obligatoires)*
+## Installation
 
-#### 7. Authentification multi-rôles
-- Au minimum **3 types d'utilisateurs** avec des rôles distincts, par exemple :
-  - `Administrateur` — accès total
-  - `Gestionnaire / Agent` — accès métier partiel
-  - `Client / Utilisateur` — accès restreint à son propre espace
-- Système de rôles implémenté
-- Redirection automatique selon le rôle après connexion
-- Protection des routes par rôle
+### Prérequis
 
-#### 8. Middleware personnalisés
-- Au moins **3 middleware** créés manuellement (ex: `CheckRole`, `CheckAccountActive`, `RateLimited`)
-- Middleware appliqué aux routes ou groupes de routes concernés
-- Explication claire du rôle de chaque middleware dans le README
+- PHP 8.3+, Composer, MySQL (XAMPP / Laragon / WAMP)
+- Compte [Mailtrap](https://mailtrap.io) (Email Testing) pour les emails et la 2FA en local
 
-#### 9. Dashboard Administrateur
-- Tableau de bord dédié à l'administrateur avec :
-  - **Statistiques globales** (nombre d'utilisateurs, transactions, etc.)
-  - **Graphiques** (Chart.js ou autre)
-  - **Activité récente** (dernières inscriptions, actions, alertes)
-  - Gestion complète des utilisateurs (liste, activation/désactivation, suppression)
-  - Gestion des contenus ou entités principales de l'application
+### Étapes rapides
 
-#### 10. Mailing (Email)
-- Configuration d'un service d'envoi d'email (Mailtrap en dev, SMTP en prod)
-- Au moins **4 types d'emails** envoyés automatiquement :
-  - Email de bienvenue à l'inscription
-  - Email de confirmation d'une action importante (commande, paiement, etc.)
-  - Email de confirmation de l'adresse mail après création de compte
-  - Email de notification (alerte, changement de statut, etc.)
-- Utilisation des **Mailables** et des **templates Blade** pour les emails
-- Emails en file d'attente avec **Laravel Queues** (bonus apprécié)
+```powershell
+cd C:\Users\HP\Projects\examen-php-laravel-l3
 
-#### 11. Double Authentification (2FA)
-- Implémentation de la vérification en deux étapes :
-  - Envoi d'un **code OTP par email** à la connexion
-  - Saisie du code pour valider l'accès
-  - Expiration du code après un délai défini (5 à 10 minutes)
-- Option d'activation/désactivation du 2FA depuis le profil utilisateur
+# Si besoin (sanctum / dompdf absents du lock file) :
+composer update laravel/sanctum barryvdh/laravel-dompdf --no-interaction
 
----
-
-### Niveau 3 — Avancés *(au moins 3 parmi les suivants)*
-
-#### 12. API REST
-- Endpoints RESTful documentés et fonctionnels
-- Authentification de l'API via **Laravel Sanctum** (tokens)
-- Réponses JSON standardisées (code HTTP, message, data)
-- Au moins 5 endpoints couvrant les opérations CRUD d'une entité
-
-#### 13. Upload & Gestion de fichiers
-- Upload sécurisé de fichiers (images, documents PDF)
-- Validation du type et de la taille du fichier
-- Stockage organisé dans `storage/app/public`
-- Génération de miniatures pour les images (bonus)
-
-#### 14. Notifications
-- Utilisation du système de **Notifications Laravel** (`php artisan make:notification`)
-- Notifications en base de données (cloche d'alertes dans l'interface)
-- Notifications par email déclenchées par des événements métier
-
-#### 15. Événements & Listeners (Facultatif)
-- Au moins **1 Event/Listener** implémenté (ex: `UserRegistered`, `PaymentCompleted`)
-- Découplage logique entre les actions et leurs conséquences
-
-#### 16. Paiement mobile intégré
-- Intégration **une API de paiement mobile** (M-Pesa, Airtel Money, Orange Money)
-- Workflow complet : initiation → confirmation → mise à jour du statut
-- Historique des transactions avec statuts (en attente, réussi, échoué)
-- Reçu de paiement généré automatiquement (PDF ou email)
-- Lien de la documentation de LabPay : [https://doc.api.labyrinthe-rdc.com/](https://doc.api.labyrinthe-rdc.com/)
-
-#### 17. Génération de PDF
-- Génération dynamique de documents PDF (factures, reçus, rapports, attestations)
-- Utilisation d'un package dédié (DomPDF, Snappy, etc.)
-- Téléchargement et/ou envoi par email du PDF
-
-#### 18. Recherche avancée & Filtres
-- Filtres combinés sur les listes (par date, statut, catégorie, etc.)
-- Barre de recherche avec résultats en temps réel (AJAX ou Livewire)
-
-#### 19. Logs & Traçabilité
-- Journalisation des actions sensibles (connexions, modifications, suppressions)
-- Interface d'administration pour consulter les logs
-- Utilisation de `Log::info()`, `Log::warning()` etc. de manière cohérente
-
-#### 20. Déploiement
-- Application déployée sur un serveur en ligne (Heroku, Railway, VPS, etc.)
-- Fichier `.env.example` fourni avec toutes les variables nécessaires
-- Base de données de production configurée
-
----
-
-## Base de données
-
-- Fournir le **schéma de la base de données** dans le dossier `docs/`
-- Toutes les tables doivent avoir des clés étrangères correctement définies
-- Les **seeders** doivent permettre de tester l'application immédiatement après installation
-
----
-
-## Documentation (README.md et fichier pdf)
-
-Le fichier README doit obligatoirement contenir :
-
-- [ ] Titre et description du projet
-- [ ] Nom de l'étudiant(e)
-- [ ] Technologies utilisées (Laravel version, PHP version, base de données, dépendances rajoutées)
-- [ ] Instructions d'installation pas à pas
-- [ ] Comptes de test (email + mot de passe pour chaque rôle)
-- [ ] Liste des fonctionnalités implémentées
-- [ ] Schéma de la base de données (image ou lien)
-- [ ] Difficultés rencontrées et solutions trouvées
-- [ ] Lien vers l'application déployée *(si applicable)*
-
----
-
-## Installation du projet
-
-```bash
-# 1. Cloner le dépôt
-git clone https://github.com/votre-username/nom-du-projet.git
-cd nom-du-projet
-
-# 2. Installer les dépendances
 composer install
-npm install && npm run build
-
-# 3. Configurer l'environnement
-cp .env.example .env
+copy .env.example .env
 php artisan key:generate
+```
 
-# 4. Configurer la base de données dans le fichier .env
-# DB_DATABASE=nom_de_la_base
-# DB_USERNAME=root
-# DB_PASSWORD=
+1. Créer la base MySQL : `CREATE DATABASE shae;`
+2. Configurer `.env` : `DB_DATABASE=shae`, identifiants MySQL, **Mailtrap SMTP** (voir ci-dessous)
+3. Migrer et peupler :
 
-# 5. Exécuter les migrations et les seeders
-php artisan migrate --seed
-
-# 6. Lier le stockage public
+```powershell
+php artisan migrate:fresh --seed
 php artisan storage:link
-
-# 7. Lancer le serveur
 php artisan serve
 ```
+
+Ouvrir [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+**Scripts utiles :** `install-shae.bat`, `lancer-shae.bat`, `test-mail.bat`
+
+**Guide détaillé :** [docs/INSTALLATION.md](docs/INSTALLATION.md)
+
+### Configuration Mailtrap (emails + 2FA)
+
+Dans Mailtrap → **Email Testing** → **Inboxes** → **SMTP**, copier Username et Password :
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=votre_username_mailtrap
+MAIL_PASSWORD=votre_password_mailtrap
+MAIL_SCHEME=smtp
+```
+
+Tester : `php artisan config:clear` puis `.\test-mail.bat`
 
 ---
 
 ## Comptes de test
 
-| Rôle | Email | Mot de passe |
-|------|-------|--------------|
-| Administrateur | admin@exemple.com | password |
-| Gestionnaire | gestionnaire@exemple.com | password |
-| Client | client@exemple.com | password |
+Créés automatiquement par `DatabaseSeeder` :
 
-> Ces comptes doivent être créés automatiquement par les **Seeders**.
+| Rôle | Email | Mot de passe | Accès principal |
+|------|-------|--------------|-----------------|
+| Administrateur | sharonemulembweng@gmail.com | password | `/admin/dashboard` |
+| Gestionnaire | gestionnaire@exemple.com | password | `/gestionnaire/products` |
+| Client | client@exemple.com | password | Catalogue, panier, commandes |
 
----
-
-## Grille d'évaluation
-
-| Critère | Points |
-|--------|--------|
-| Architecture MVC & Structure du code | 10 |
-| Base de données, Migrations & Relations Eloquent | 15 |
-| Authentification multi-rôles & Middleware | 15 |
-| Dashboard administrateur | 10 |
-| CRUD complet & Validation | 10 |
-| Mailing | 10 |
-| Double authentification (2FA) | 10 |
-| Fonctionnalités avancées (API, Paiement…) | 15 |
-| Documentation & Qualité du code | 5 |
-| **Total** | **100** |
+> L’inscription publique crée toujours un compte **client**. La 2FA est **optionnelle** (activable dans Mon profil).
 
 ---
 
-## Règles importantes
+## Fonctionnalités implémentées
 
-- Le projet doit être **individuel** sauf indication contraire du professeur
-- Tout plagiat ou copie de code entre étudiants entraînera la note de **0**
-- Le code doit être versionné sur **GitHub** (historique de commits exigé)
-- Un projet sans migrations (tables créées à la main) sera **pénalisé**
-- L'application doit fonctionner sans erreur au moment de la soutenance
+### Niveau 1 — Fondamentaux
+
+- [x] Architecture MVC (Models, Controllers, Views Blade)
+- [x] Migrations + seeders (aucune table créée manuellement)
+- [x] Relations Eloquent (`User`, `Product`, `Category`, `Order`, `Payment`, etc.)
+- [x] CRUD produits (gestionnaire) avec pagination
+- [x] Recherche et filtrage par catégorie sur le catalogue
+- [x] Resource routes (`gestionnaire/products`, API `products`)
+- [x] Layouts Blade, partials, affichage conditionnel par rôle
+- [x] Form Requests + validation + protection CSRF
+
+### Niveau 2 — Intermédiaires
+
+- [x] **3 rôles** : administrateur, gestionnaire, client
+- [x] Redirection après connexion selon le rôle
+- [x] **3 middleware personnalisés** (voir tableau ci-dessous)
+- [x] Dashboard administrateur (statistiques, graphiques Chart.js, utilisateurs)
+- [x] **5 emails** (Mailables + templates Blade) :
+  - Bienvenue à l’inscription (`WelcomeMail`)
+  - Confirmation de commande (`OrderConfirmedMail`)
+  - Vérification email (Laravel `Registered` + notice)
+  - Reçu de paiement (`PaymentReceiptMail`)
+  - Notification de statut (`StatusNotificationMail`)
+  - Code OTP 2FA (`OtpMail`)
+- [x] **2FA** : OTP par email, expiration 10 min, activation/désactivation dans le profil
+
+### Niveau 3 — Avancés *(4 fonctionnalités)*
+
+- [x] **API REST** Sanctum (`/api/login`, `/api/products` CRUD, `/api/me`)
+- [x] **Upload d’images** produits (`storage/app/public`, validation)
+- [x] **Paiement mobile LabPay** : initiation → statut → callback → historique
+- [x] **Event/Listener** `PaymentCompleted` → emails + mise à jour stock
+- [x] **Reçu PDF** téléchargeable (DomPDF)
 
 ---
 
-## Calendrier
+## Middleware personnalisés
 
-| Étape | Date limite |
-|-------|-------------|
-| Choix du sujet validé | À définir |
-| Remise du schéma de base de données | À définir |
-| Remise du projet complet (GitHub) | À définir |
-| Soutenance orale | À définir |
+| Middleware | Fichier | Rôle |
+|------------|---------|------|
+| `CheckRole` | `app/Http/Middleware/CheckRole.php` | Restreint l’accès aux routes selon le rôle (`admin`, `gestionnaire`, `client`) |
+| `CheckAccountActive` | `app/Http/Middleware/CheckAccountActive.php` | Bloque les comptes désactivés par l’administrateur |
+| `RateLimited` | `app/Http/Middleware/RateLimited.php` | Limite les tentatives (ex. login) par adresse IP |
 
 ---
 
-*Document préparé par le corps enseignant de la FASI/UPC — Cours Laravel L3 · 2025–2026*
+## Paiement mobile (LabPay)
+
+**Workflow :** panier → commande → initiation paiement (numéro mobile) → confirmation → statut mis à jour → reçu PDF + email.
+
+| Mode | Configuration | Comportement |
+|------|---------------|--------------|
+| **Développement** | `LABPAY_API_KEY` vide | Simulation : bouton « Simuler paiement réussi (dev) » — aucun débit réel |
+| **Production / démo réelle** | `LABPAY_API_KEY` (token Labyrinthe) + callback HTTPS public | Push USSD sur le téléphone → saisie du PIN → callback LabPay → commande payée |
+
+Variables `.env` : `LABPAY_API_URL`, `LABPAY_API_KEY`, `LABPAY_CURRENCY` (USD/CDF), `LABPAY_COUNTRY` (CD), `LABPAY_CALLBACK_URL`
+
+Documentation API : [doc.api.labyrinthe-rdc.com](https://doc.api.labyrinthe-rdc.com/)
+
+**Test local (simulation) :** panier → checkout → initier paiement → **Simuler paiement réussi**.
+
+**Test réel :** compte sur [pay.labyrinthe-rdc.com](https://pay.labyrinthe-rdc.com) → token API → `.env` → site accessible en HTTPS (ngrok ou hébergement) pour le callback.
+
+---
+
+## Schéma de la base de données
+
+Documentation complète : [docs/schema-bdd.md](docs/schema-bdd.md)
+
+**Tables principales :** `users`, `categories`, `products`, `orders`, `order_items`, `payments`, `otp_codes`, `personal_access_tokens`
+
+**Catégories :** 5 catégories plates (Électronique, Mode, Maison, Alimentation, Beauté).
+
+---
+
+## Difficultés rencontrées et solutions
+
+| Difficulté | Solution |
+|------------|----------|
+| Packages `sanctum` / `dompdf` absents du lock Composer | `composer update laravel/sanctum barryvdh/laravel-dompdf` |
+| Erreur 500 au démarrage (MySQL, migrations) | Démarrer MySQL (XAMPP), `php artisan migrate:fresh --seed` |
+| Conflit de routes `products.show` (web vs API) | Préfixe des noms de routes API : `api.products.*` |
+| Emails SMTP / 2FA (erreur 530, limite Mailtrap) | Mailtrap **Email Testing** (sandbox), pas Email Sending ; identifiants SMTP de l’inbox ; gestion des erreurs mail sans bloquer le paiement |
+| Paiement LabPay en local sans clés API | Mode simulation documenté + bouton dev sur `/payments/status/{id}` |
+| Fichier `.env` invalide (espaces dans les valeurs) | Mettre les valeurs avec espaces entre guillemets ou utiliser le username SMTP sans espace |
+
+---
+
+## Structure du dépôt
+
+```
+examen-php-laravel-l3/
+├── app/Http/Controllers/    # Web + API + Admin + Gestionnaire + Client
+├── app/Http/Middleware/     # CheckRole, CheckAccountActive, RateLimited
+├── app/Mail/                # 5+ Mailables
+├── app/Services/            # LabPay, OTP, PaymentCompletion
+├── database/migrations/     # Schéma complet
+├── database/seeders/        # Comptes + catalogue de démo
+├── resources/views/         # Blade (marketplace magenta)
+├── routes/web.php, api.php
+├── docs/                    # INSTALLATION, RAPPORT, schema-bdd
+└── .env.example
+```
+
+---
+
+## Déploiement
+
+| Élément | Statut |
+|---------|--------|
+| Hébergeur | **Render** (Docker, `render.yaml`) |
+| URL publique | `https://shae.onrender.com` (après déploiement) |
+| Base production | **MySQL** (MariaDB dans le conteneur Docker) |
+| Clés LabPay production | Variable `LABPAY_API_KEY` dans le dashboard Render |
+
+Guide pas à pas : **[docs/DEPLOIEMENT-RENDER.md](docs/DEPLOIEMENT-RENDER.md)**
+
+---
+
+## Documentation complémentaire
+
+| Fichier | Contenu |
+|---------|---------|
+| [docs/DEPLOIEMENT-RENDER.md](docs/DEPLOIEMENT-RENDER.md) | Déployer SHAE sur Render (URL fixe LabPay) |
+| [docs/INSTALLATION.md](docs/INSTALLATION.md) | Guide d’installation détaillé |
+| [docs/RAPPORT.md](docs/RAPPORT.md) | Rapport technique (à exporter en PDF pour le rendu) |
+| [docs/schema-bdd.md](docs/schema-bdd.md) | Schéma relationnel |
+
+---
+
+## Dépôt GitHub
+
+*À compléter :* `https://github.com/votre-username/shae`
+
+> Historique de commits exigé pour le rendu.
+
+---
+
+*Projet réalisé dans le cadre du cours Laravel L3 — FASI/UPC — 2025–2026*

@@ -1,0 +1,46 @@
+# Dependencies
+/vendor
+/node_modules
+
+# Local / dev
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.idea
+.vscode
+.cursor
+.codex
+.phpunit.cache
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+
+# Logs & cache
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/pail
+/storage/app/labpay-api-token.txt
+
+# Duplicate / parasite project folder
+/Examen
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dev scripts (not needed in container)
+*.bat
+*.ps1
+test-mail.php
+copy-migrate.py
+generer-cle.php
+install-shae.php
+sync-admin.php
+
+# Docs only on disk
+/docs
