@@ -5,12 +5,20 @@ cd /var/www/html
 
 echo "[render] Boot SHAE..."
 
-DB_HOST="${DB_HOST:-127.0.0.1}"
-DB_DATABASE="${DB_DATABASE:-shae}"
-DB_USERNAME="${DB_USERNAME:-root}"
-DB_PASSWORD="${DB_PASSWORD:-}"
+export DB_HOST="${DB_HOST:-localhost}"
+export DB_DATABASE="${DB_DATABASE:-shae}"
+export DB_USERNAME="${DB_USERNAME:-root}"
+export DB_PASSWORD="${DB_PASSWORD:-}"
+export SESSION_DRIVER="${SESSION_DRIVER:-file}"
+export CACHE_STORE="${CACHE_STORE:-file}"
 
-chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+if [ -z "${APP_KEY:-}" ]; then
+    echo "[render] ERROR: APP_KEY is missing. Set it in Render Environment."
+    exit 1
+fi
+
+mkdir -p storage/framework/{cache,sessions,views} storage/logs storage/app/public/products
+chmod -R 777 storage bootstrap/cache 2>/dev/null || true
 
 start_embedded_mysql() {
     echo "[render] Starting MariaDB (MySQL)..."
@@ -33,17 +41,10 @@ start_embedded_mysql() {
 
     mariadb -u root <<-EOSQL
 CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\`;
-EOSQL
-
-    if [ "${DB_USERNAME}" != "root" ]; then
-        mariadb -u root <<-EOSQL
-CREATE USER IF NOT EXISTS '${DB_USERNAME}'@'127.0.0.1' IDENTIFIED BY '${DB_PASSWORD}';
-CREATE USER IF NOT EXISTS '${DB_USERNAME}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';
-GRANT ALL PRIVILEGES ON \`${DB_DATABASE}\`.* TO '${DB_USERNAME}'@'127.0.0.1';
-GRANT ALL PRIVILEGES ON \`${DB_DATABASE}\`.* TO '${DB_USERNAME}'@'localhost';
+CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 EOSQL
-    fi
 }
 
 if [ "${DB_HOST}" = "127.0.0.1" ] || [ "${DB_HOST}" = "localhost" ]; then
@@ -52,21 +53,28 @@ else
     echo "[render] External MySQL: ${DB_HOST}"
 fi
 
-echo "[render] Waiting for database connection..."
+echo "[render] Waiting for database (host=${DB_HOST})..."
+db_ready=0
 for i in $(seq 1 45); do
     if php -r "
-        \$h = getenv('DB_HOST') ?: '127.0.0.1';
+        \$h = getenv('DB_HOST') ?: 'localhost';
         \$p = getenv('DB_PORT') ?: '3306';
         \$d = getenv('DB_DATABASE') ?: 'shae';
         \$u = getenv('DB_USERNAME') ?: 'root';
         \$w = getenv('DB_PASSWORD') ?: '';
         new PDO(\"mysql:host=\$h;port=\$p;dbname=\$d\", \$u, \$w);
     " 2>/dev/null; then
-        echo "[render] Database connected (${i})"
+        echo "[render] Database connected (attempt ${i})"
+        db_ready=1
         break
     fi
     sleep 2
 done
+
+if [ "${db_ready}" -ne 1 ]; then
+    echo "[render] ERROR: could not connect to MySQL"
+    exit 1
+fi
 
 php artisan optimize:clear
 
@@ -74,14 +82,11 @@ echo "[render] Running migrations..."
 php artisan migrate --force
 
 echo "[render] Seeding if empty..."
-php artisan tinker --execute="if (\\App\\Models\\User::query()->count() === 0) { \\Illuminate\\Support\\Facades\\Artisan::call('db:seed', ['--force' => true]); echo 'Seeded'; } else { echo 'Skip seed'; }"
+php docker/seed-if-empty.php
 
 php artisan storage:link 2>/dev/null || true
 
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
+echo "[render] Ready (no config cache — reads env live)"
 PORT="${PORT:-10000}"
 echo "[render] Laravel listening on 0.0.0.0:${PORT}"
 exec php artisan serve --host=0.0.0.0 --port="${PORT}"
