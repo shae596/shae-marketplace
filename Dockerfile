@@ -37,4 +37,4 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction \
 ENV PORT=10000
 EXPOSE 10000
 
-CMD ["docker/render-start.sh"]
+CMD ["/bin/bash", "docker/render-start.sh"]

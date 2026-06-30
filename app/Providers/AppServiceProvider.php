@@ -38,7 +38,11 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(PaymentCompleted::class, HandlePaymentCompleted::class);
 
         View::composer(['partials.navbar', 'partials.category-bar', 'layouts.app', 'home'], function ($view) {
-            $view->with('navCategories', Category::orderBy('name')->get());
+            try {
+                $view->with('navCategories', Category::orderBy('name')->get());
+            } catch (\Throwable) {
+                $view->with('navCategories', collect());
+            }
         });
     }
 }

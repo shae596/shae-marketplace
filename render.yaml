@@ -34,7 +34,7 @@ services:
       - key: APP_KEY
         generateValue: true
       - key: APP_URL
-        sync: false
+        value: https://shae.onrender.com
       - key: APP_FORCE_HTTPS
         value: "true"
       - key: LOG_CHANNEL
@@ -50,9 +50,9 @@ services:
       - key: DB_DATABASE
         value: shae
       - key: DB_USERNAME
-        value: shae
+        value: root
       - key: DB_PASSWORD
-        generateValue: true
+        value: ""
       - key: SESSION_DRIVER
         value: database
       - key: CACHE_STORE
@@ -72,4 +72,4 @@ services:
       - key: LABPAY_COUNTRY
         value: CD
       - key: LABPAY_CALLBACK_URL
-        sync: false
+        value: https://shae.onrender.com/payments/callback
