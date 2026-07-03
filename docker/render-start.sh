@@ -13,7 +13,7 @@ export SESSION_DRIVER="${SESSION_DRIVER:-file}"
 export CACHE_STORE="${CACHE_STORE:-file}"
 
 if [ -z "${APP_KEY:-}" ]; then
-    echo "[render] ERROR: APP_KEY is missing. Set it in Render Environment."
+    echo "[render] ERROR: APP_KEY is missing. Add it in Render Environment."
     exit 1
 fi
 
@@ -41,8 +41,10 @@ start_embedded_mysql() {
 
     mariadb -u root <<-EOSQL
 CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\`;
-CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '';
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+CREATE USER IF NOT EXISTS '${DB_USERNAME}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';
+CREATE USER IF NOT EXISTS '${DB_USERNAME}'@'127.0.0.1' IDENTIFIED BY '${DB_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${DB_DATABASE}\`.* TO '${DB_USERNAME}'@'localhost';
+GRANT ALL PRIVILEGES ON \`${DB_DATABASE}\`.* TO '${DB_USERNAME}'@'127.0.0.1';
 FLUSH PRIVILEGES;
 EOSQL
 }
@@ -53,7 +55,7 @@ else
     echo "[render] External MySQL: ${DB_HOST}"
 fi
 
-echo "[render] Waiting for database (host=${DB_HOST})..."
+echo "[render] Waiting for database (host=${DB_HOST}, user=${DB_USERNAME})..."
 db_ready=0
 for i in $(seq 1 45); do
     if php -r "
@@ -86,7 +88,6 @@ php docker/seed-if-empty.php
 
 php artisan storage:link 2>/dev/null || true
 
-echo "[render] Ready (no config cache — reads env live)"
 PORT="${PORT:-10000}"
 echo "[render] Laravel listening on 0.0.0.0:${PORT}"
 exec php artisan serve --host=0.0.0.0 --port="${PORT}"
